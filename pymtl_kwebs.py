@@ -7,7 +7,7 @@ from kieler_web import json_graph_to_svg
 #-----------------------------------------------------------------------
 # pymtl_to_svg
 #-----------------------------------------------------------------------
-def pymtl_to_svg( pymtl_model, show_clk_reset=False ):
+def pymtl_to_svg( pymtl_model, show_clk_reset=True ):
 
   graph_json = pymtl_to_json( pymtl_model, show_clk_reset )
   import pprint
@@ -19,7 +19,7 @@ def pymtl_to_svg( pymtl_model, show_clk_reset=False ):
 #-----------------------------------------------------------------------
 # pymtl_to_json
 #-----------------------------------------------------------------------
-def pymtl_to_json( pymtl_model, show_clk_reset=False ):
+def pymtl_to_json( pymtl_model, show_clk_reset=True ):
 
   children = [ _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset ) ]
 
@@ -32,7 +32,7 @@ def pymtl_to_json( pymtl_model, show_clk_reset=False ):
 #-----------------------------------------------------------------------
 # _recurse_pymtl_hierarchy
 #-----------------------------------------------------------------------
-def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=False ):
+def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=True ):
 
   #---------------------------------------------------------------------
   # visit children
