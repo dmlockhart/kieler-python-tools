@@ -46,7 +46,7 @@ def test_pymtl_to_svg( show_clk_reset ):
 
   # write out the svg file
 
-  filen  = 'pymtl-clk.svg' if show_clk_reset else 'pymtl-no-clk.svg'
+  filen  = '_tmp-pymtl-clk.svg' if show_clk_reset else '_tmp-pymtl-no-clk.svg'
   if os.path.exists( filen ):
     os.remove( filen )
 

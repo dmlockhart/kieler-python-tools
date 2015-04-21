@@ -57,7 +57,7 @@ def test_request_layout( oFormat ):
 
   # save the output to a file
 
-  filen  = oFormat+'.svg'
+  filen  = '_tmp-'+oFormat+'.svg'
   if os.path.exists( filen ):
     os.remove( filen )
 
@@ -102,7 +102,7 @@ def test_json_graph_to_svg( server ):
       pytest.skip('Cannot connect to server.')
     raise e
 
-  filen  = 'kwebs.svg' if 'kiel' in server else 'localhost.svg'
+  filen  = '_tmp-kwebs.svg' if 'kiel' in server else '_tmp-localhost.svg'
   if os.path.exists( filen ):
     os.remove( filen )
 
