@@ -1,7 +1,11 @@
+import os
+import pytest
 import json
-import kieler_web as kw
+import json_to_svg as j2s
+import kieler_web  as kw
 
-def test_request_layout():
+@pytest.mark.parametrize('oFormat', ['org.w3.svg', 'org.json'])
+def test_request_layout( oFormat ):
 
   test_data = {
     'config'  : json.dumps({
@@ -10,8 +14,7 @@ def test_request_layout():
                 'edgeRouting' : 'ORTHOGONAL'
                 }),
     'iFormat' : 'org.json',
-    'oFormat' : 'org.w3.svg',
-    #'oFormat' : 'org.json',
+    'oFormat' : oFormat,
     'graph'   : json.dumps({
                 'id': "root",
                 'children': [
@@ -36,7 +39,19 @@ def test_request_layout():
   }
 
   output = kw.request_layout( test_data )
-  output = kw.fixup_svg( output )
-  with open('test_svg.svg', 'w') as fp:
-    fp.write( output )
+
+  if   'svg'  in oFormat:
+    svg_text = kw.fixup_svg( output )
+  elif 'json' in oFormat:
+    json_text = json.loads( output )
+    svg_text  = j2s.json_to_svg( json_text )
+
+  filen  = oFormat+'.svg'
+  if os.path.exists( filen ):
+    os.remove( filen )
+
+  with open( filen, 'w' ) as fp:
+    fp.write( svg_text )
+
+  assert os.path.exists( filen )
 
