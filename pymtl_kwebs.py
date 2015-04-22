@@ -10,8 +10,6 @@ from kieler_web import json_graph_to_svg
 def pymtl_to_svg( pymtl_model, show_clk_reset=True ):
 
   graph_json = pymtl_to_json( pymtl_model, show_clk_reset )
-  import pprint
-  pprint.pprint( graph_json )
   graph_svg  = json_graph_to_svg( graph_json )
 
   return graph_svg
@@ -69,6 +67,8 @@ def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=True ):
   for edge in pymtl_model.get_connections():
     src, dest = edge.src_node, edge.dest_node
     if 'Wire' in src.__class__.__name__ or 'Wire' in dest.__class__.__name__:
+      continue
+    if src.parent == None or dest.parent == None:
       continue
     edge_dict = {
       'id'         : id(edge),
