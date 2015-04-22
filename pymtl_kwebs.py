@@ -23,8 +23,9 @@ def pymtl_to_json( pymtl_model, show_clk_reset=True ):
 
   children = [ _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset ) ]
 
-  graph_json = {'id'      :'root',
+  graph_json = {'id'      : 'root',
                 'children': children,
+                'padding' : {'left': 20, 'top': 20, 'right': 20, 'bottom': 20},
                }
 
   return graph_json
