@@ -5,9 +5,19 @@
 import os
 import pytest
 import pprint
+import requests
 
 from pymtl       import *
 from pymtl_kwebs import *
+
+#-----------------------------------------------------------------------
+# py.test fixture
+#-----------------------------------------------------------------------
+@pytest.fixture
+def out_filename( request ):
+  nodeid   = request.node.nodeid
+  filename = nodeid.split(':')[-1] + '.svg'
+  return filename
 
 #-----------------------------------------------------------------------
 # test_pymtl_to_json
@@ -17,7 +27,7 @@ def test_pymtl_to_json( show_clk_reset ):
 
   # instantiate and elaborate
 
-  x = MyTest2( 8 )
+  x = MyTestTop( 8 )
   x.elaborate()
 
   # translate to json
@@ -27,12 +37,11 @@ def test_pymtl_to_json( show_clk_reset ):
 #-----------------------------------------------------------------------
 # test_pymtl_to_svg
 #-----------------------------------------------------------------------
-@pytest.mark.parametrize('show_clk_reset', [True, False])
-def test_pymtl_to_svg( show_clk_reset ):
+def test_pymtl_to_svg( out_filename, ModelType, show_clk_reset ):
 
   # instantiate and elaborate
 
-  x = MyTest2( 8 )
+  x = ModelType( 8 )
   x.elaborate()
 
   # translate to svg
@@ -46,28 +55,18 @@ def test_pymtl_to_svg( show_clk_reset ):
 
   # write out the svg file
 
-  filen  = '_tmp-pymtl-clk.svg' if show_clk_reset else '_tmp-pymtl-no-clk.svg'
-  if os.path.exists( filen ):
-    os.remove( filen )
+  if os.path.exists( out_filename ):
+    os.remove( out_filename )
 
-  with open( filen, 'w' ) as fp:
+  with open( out_filename, 'w' ) as fp:
     fp.write( graph_svg )
 
-  assert os.path.exists( filen )
+  assert os.path.exists( out_filename )
 
 #=======================================================================
 # test models
 #=======================================================================
-
-class MyTest( Model ):
-  def __init__( s, nbits ):
-    s.in_ = InPort ( nbits )
-    s.out = OutPort( nbits )
-    @s.combinational
-    def logic():
-      s.out.value = s.in_
-
-class MyTest2( Model ):
+class MyTestTop( Model ):
   def __init__( s, nbits ):
     s.in_ = InPort ( nbits )
     s.out = OutPort( nbits )
@@ -77,3 +76,35 @@ class MyTest2( Model ):
       s.in_, s.mod.in_,
       s.out, s.mod.out,
     )
+
+class MyTest( Model ):
+  def __init__( s, nbits ):
+    s.in_ = InPort ( nbits )
+    s.out = OutPort( nbits )
+    @s.combinational
+    def logic():
+      s.out.value = s.in_
+
+class MyTestWire( Model ):
+  def __init__( s, nbits ):
+    s.in_  = InPort ( nbits )
+    s.out  = OutPort( nbits )
+    s.out2 = OutPort( nbits )
+
+    s.mod = MyTest ( nbits )
+    s.connect_pairs(
+      s.in_, s.mod.in_,
+      s.out, s.mod.out,
+    )
+
+    s.wire = Wire( nbits )
+    s.connect_pairs(
+      s.in_,  s.wire,
+      s.wire, s.out,
+    )
+
+pytest.mark.parametrize('ModelType,show_clk_reset', [
+  (MyTestTop,  True),
+  (MyTestTop,  False),
+  (MyTestWire, False),
+])( test_pymtl_to_svg )
