@@ -103,8 +103,22 @@ class MyTestWire( Model ):
       s.wire, s.out,
     )
 
+class MyTestConstant( Model ):
+  def __init__( s, nbits ):
+    s.in_  = InPort ( nbits )
+    s.out  = OutPort[2]( nbits )
+
+    s.mod = MyTest[2]( nbits )
+    s.connect_pairs(
+      s.in_,    s.mod[0].in_,
+          5,    s.mod[1].in_,
+      s.out[0], s.mod[0].out,
+      s.out[1], s.mod[1].out,
+    )
+
 pytest.mark.parametrize('ModelType,show_clk_reset', [
-  (MyTestTop,  True),
-  (MyTestTop,  False),
-  (MyTestWire, False),
+  (MyTestTop,      True),
+  (MyTestTop,      False),
+  (MyTestWire,     False),
+  (MyTestConstant, False),
 ])( test_pymtl_to_svg )
