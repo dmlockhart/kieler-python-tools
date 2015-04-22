@@ -67,12 +67,15 @@ def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=True ):
 
   edges = []
   for edge in pymtl_model.get_connections():
+    src, dest = edge.src_node, edge.dest_node
+    if 'Wire' in src.__class__.__name__ or 'Wire' in dest.__class__.__name__:
+      continue
     edge_dict = {
       'id'         : id(edge),
-      'source'     : id(edge.src_node.parent),
-      'target'     : id(edge.dest_node.parent),
-      'sourcePort' : id(edge.src_node),
-      'targetPort' : id(edge.dest_node),
+      'source'     : id(src.parent),
+      'target'     : id(dest.parent),
+      'sourcePort' : id(src),
+      'targetPort' : id(dest),
     }
     edges.append( edge_dict )
 
