@@ -25,6 +25,8 @@ def request_layout( kieler_json_req, kieler_server_url=UNI_KIEL ):
   r = requests.post( kieler_server_url, data = kieler_json_req )
 
   print r.headers
+  if not r.ok:
+    print r.text
   assert r.ok
   return r.text
 
