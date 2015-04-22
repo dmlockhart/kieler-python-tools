@@ -66,10 +66,12 @@ def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=True ):
   edges = []
   for edge in pymtl_model.get_connections():
     src, dest = edge.src_node, edge.dest_node
+
+    # TODO: this is super hacky; import PyMTL, or have is_wire() check?
+
     if 'Wire' in src.__class__.__name__ or 'Wire' in dest.__class__.__name__:
       continue
-    if src.parent == None or dest.parent == None:
-      continue
+
     edge_dict = {
       'id'         : id(edge),
       'source'     : id(src.parent),
@@ -77,6 +79,19 @@ def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=True ):
       'sourcePort' : id(src),
       'targetPort' : id(dest),
     }
+
+    # Create a constant node if edge is connected to a constant
+
+    if 'Constant' in src.__class__.__name__:
+      children.append( _create_constant_dict( src ) )
+      edge_dict['source']     = id(src)
+      edge_dict['sourcePort'] = None
+
+    if 'Constant' in dest.__class__.__name__:
+      children.append( _create_constant_dict( dest ) )
+      edge_dict['target']     = id(dest)
+      edge_dict['targetPort'] = None
+
     edges.append( edge_dict )
 
   #---------------------------------------------------------------------
@@ -98,4 +113,16 @@ def _recurse_pymtl_hierarchy( pymtl_model, show_clk_reset=True ):
   }
 
   return subgraph
+
+#-----------------------------------------------------------------------
+# _create_constant_dict
+#-----------------------------------------------------------------------
+def _create_constant_dict( constant ):
+  constant_dict = {
+    'id'     : id(constant),
+    'labels' : [{'text':constant.name}],
+    'width'  : 20,
+    'height' : 20,
+  }
+  return constant_dict
 
